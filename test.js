@@ -69,9 +69,9 @@ function nested() {
   console.log("\nConsuming nested stream");
   consume(stream, function (item) {
     console.log(item);
-    consume(item.stream, console.log)(function (err) {
+    consume(item.stream, console.log.bind(console, "\t"))(function (err) {
       if (err) throw err;
-      console.log("SUBEND");
+      console.log("\t", "END");
     });
   })(function (err) {
     if (err) throw err;
