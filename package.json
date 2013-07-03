@@ -1,0 +1,24 @@
+{
+  "name": "sub-stream",
+  "version": "0.0.1",
+  "description": "A simple-streams pull-filter for converting flat streams into nested streams.",
+  "main": "sub.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/creationix/sub-stream.git"
+  },
+  "keywords": [
+    "simple-stream",
+    "transform",
+    "filter",
+    "substream"
+  ],
+  "author": "Tim Caswell <tim@creationix.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/creationix/sub-stream/issues"
+  }
+}
