@@ -9,7 +9,9 @@ function source(a, b) {
     var item = n ? n : {num : a};
     n = (n + 1) % b;
     if (!n) a--;
-    callback(null, item);
+    process.nextTick(function () {
+      callback(null, item);    
+    });
   }
   function abort(callback) {
     a = 0;
@@ -43,19 +45,38 @@ function consume(stream, onItem) {
   }
 }
 
+flat();
+
 // Dump the original flat stream
-var stream = source(5, 4);
-console.log("Consuming flat stream");
-consume(stream, console.log)(onDone);
+function flat() {
 
-// Dump the nested stream
-var stream = subStream(source(5, 4), function (item) {
-  return typeof item === "object";
-});
-console.log("\nConsuming nested stream");
-consume(stream, console.log)(onDone);
+  var stream = source(5, 4);
+  console.log("Consuming flat stream");
+  consume(stream, console.log)(function (err) {
+    if (err) throw err;
+    console.log("END");
+    nested();
+  });
 
-function onDone(err) {
-  if (err) throw err;
-  console.log("END");
 }
+
+function nested() {
+
+  // Dump the nested stream
+  var stream = subStream(source(5, 4), function (item) {
+    return typeof item === "object";
+  }, "stream");
+  console.log("\nConsuming nested stream");
+  consume(stream, function (item) {
+    console.log(item);
+    consume(item.stream, console.log)(function (err) {
+      if (err) throw err;
+      console.log("SUBEND");
+    });
+  })(function (err) {
+    if (err) throw err;
+    console.log("END");
+  });
+
+}
+
