@@ -1,6 +1,6 @@
 {
   "name": "sub-stream",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple-streams pull-filter for converting flat streams into nested streams.",
   "main": "sub.js",
   "scripts": {

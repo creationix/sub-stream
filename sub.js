@@ -2,11 +2,18 @@
 module.exports = function (stream, isHeader, prop) {
   var emit = null;
   var sub = false;
+  var data = null;
   if (!prop) prop = "stream";
   
   return { read: read, abort: stream.abort };
   
   function read(callback) {
+    if (data) {
+      var args = data;
+      data = null;
+      callback.apply(null, args);
+      return;
+    }
     if (emit) return callback(new Error("Only one read allowed at a time"));
     emit = callback;
     if (!sub) stream.read(onRead);
@@ -16,13 +23,20 @@ module.exports = function (stream, isHeader, prop) {
     var callback = emit;
     emit = null;
     if (item === undefined) {
-      return callback(err);
+      data = [err];
     }
-    if (isHeader(item)) {
+    else if (isHeader(item)) {
       item[prop] = create();
-      return callback(null, item);
+      data = [null, item];
     }
-    callback(new Error("Found non-header outside substream"));
+    else {
+      data = [new Error("Found non-header outside substream")];
+    }
+    if (callback) {
+      var args = data;
+      data = null;
+      callback.apply(null, args);
+    }
   }
   
   function create() {
