@@ -41,10 +41,12 @@ module.exports = function (stream, isHeader, prop) {
   
   function create() {
     var subEmit = null;
+    var done = false;
     sub = true;
     
     return { read: subRead, abort: stream.abort };
     function subRead(callback) {
+      if (done) return callback(new Error("SubStream is already done"));
       if (subEmit) return callback(new Error("Only one read allowed at a time"));
       subEmit = callback;
       stream.read(onSubRead);
@@ -54,6 +56,7 @@ module.exports = function (stream, isHeader, prop) {
       var callback = subEmit;
       subEmit = null;
       if (item === undefined || isHeader(item)) {
+        done = true;
         sub = false;
         callback(err);
         return onRead(err, item);
